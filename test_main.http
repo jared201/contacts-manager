@@ -1,0 +1,252 @@
+# Test your FastAPI endpoints
+
+GET http://127.0.0.1:8000/
+Accept: application/json
+
+###
+
+GET http://127.0.0.1:8000/hello/User
+Accept: application/json
+
+###
+
+# Contacts API Tests
+
+# List all contacts (initially empty)
+GET http://127.0.0.1:8000/contacts
+Accept: application/json
+
+###
+
+# Create a new contact
+POST http://127.0.0.1:8000/contacts
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "phone": "123-456-7890",
+  "address": "123 Main St, Anytown, USA"
+}
+
+###
+
+# Create another contact
+POST http://127.0.0.1:8000/contacts
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Jane Smith",
+  "email": "jane.smith@example.com",
+  "phone": "987-654-3210"
+}
+
+###
+
+# Get all contacts (should now have 2 contacts)
+GET http://127.0.0.1:8000/contacts
+Accept: application/json
+
+###
+
+# Get a specific contact (replace with an actual UUID after creating a contact)
+# GET http://127.0.0.1:8000/contacts/00000000-0000-0000-0000-000000000000
+# Accept: application/json
+
+###
+
+# Update a contact (replace with an actual UUID after creating a contact)
+# PUT http://127.0.0.1:8000/contacts/00000000-0000-0000-0000-000000000000
+# Content-Type: application/json
+# Accept: application/json
+#
+# {
+#   "name": "John Doe Updated",
+#   "address": "456 New St, Newtown, USA"
+# }
+
+###
+
+# Delete a contact (replace with an actual UUID after creating a contact)
+# DELETE http://127.0.0.1:8000/contacts/00000000-0000-0000-0000-000000000000
+
+###
+
+# Customer API Tests
+
+# List all customers (initially empty)
+GET http://127.0.0.1:8000/customers
+Accept: application/json
+
+###
+
+# Create a new customer
+POST http://127.0.0.1:8000/customers
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Acme Corporation",
+  "email": "info@acme.com",
+  "phone": "555-123-4567",
+  "address": "789 Corporate Ave, Business City, USA",
+  "company": "Acme Corporation",
+  "status": "customer",
+  "source": "referral",
+  "notes": "Large enterprise customer"
+}
+
+###
+
+# Create another customer
+POST http://127.0.0.1:8000/customers
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Startup Inc",
+  "email": "contact@startup.co",
+  "phone": "555-987-6543",
+  "company": "Startup Inc",
+  "status": "lead",
+  "source": "website"
+}
+
+###
+
+# Get all customers
+GET http://127.0.0.1:8000/customers
+Accept: application/json
+
+###
+
+# Opportunity API Tests
+
+# List all opportunities (initially empty)
+GET http://127.0.0.1:8000/opportunities
+Accept: application/json
+
+###
+
+# Create a new opportunity (replace with an actual customer UUID)
+# POST http://127.0.0.1:8000/opportunities
+# Content-Type: application/json
+# Accept: application/json
+#
+# {
+#   "name": "Enterprise Software Deal",
+#   "customer_id": "00000000-0000-0000-0000-000000000000",
+#   "amount": 50000,
+#   "stage": "proposal",
+#   "probability": 60,
+#   "description": "Enterprise software license deal"
+# }
+
+###
+
+# Get all opportunities for a customer (replace with an actual customer UUID)
+# GET http://127.0.0.1:8000/customers/00000000-0000-0000-0000-000000000000/opportunities
+# Accept: application/json
+
+###
+
+# Activity API Tests
+
+# List all activities (initially empty)
+GET http://127.0.0.1:8000/activities
+Accept: application/json
+
+###
+
+# Create a new activity (replace with actual UUIDs)
+# POST http://127.0.0.1:8000/activities
+# Content-Type: application/json
+# Accept: application/json
+#
+# {
+#   "title": "Follow-up call",
+#   "description": "Discuss proposal details",
+#   "activity_type": "call",
+#   "status": "planned",
+#   "due_date": "2023-12-15T14:00:00Z",
+#   "customer_id": "00000000-0000-0000-0000-000000000000",
+#   "opportunity_id": "00000000-0000-0000-0000-000000000000",
+#   "assigned_to": "sales_rep1"
+# }
+
+###
+
+# Note API Tests
+
+# List all notes (initially empty)
+GET http://127.0.0.1:8000/notes
+Accept: application/json
+
+###
+
+# Create a new note (replace with actual UUIDs)
+# POST http://127.0.0.1:8000/notes
+# Content-Type: application/json
+# Accept: application/json
+#
+# {
+#   "content": "Customer is interested in our premium plan",
+#   "customer_id": "00000000-0000-0000-0000-000000000000",
+#   "opportunity_id": "00000000-0000-0000-0000-000000000000",
+#   "created_by": "sales_rep1"
+# }
+
+###
+
+# User API Tests
+
+# List all users (initially empty)
+GET http://127.0.0.1:8000/users
+Accept: application/json
+
+###
+
+# Create a new user
+POST http://127.0.0.1:8000/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "admin",
+  "email": "admin@example.com",
+  "full_name": "Admin User",
+  "role": "admin",
+  "password": "securepassword"
+}
+
+###
+
+# Create another user
+POST http://127.0.0.1:8000/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "salesrep",
+  "email": "sales@example.com",
+  "full_name": "Sales Representative",
+  "role": "sales_rep",
+  "password": "salespassword"
+}
+
+###
+
+# Get all users
+GET http://127.0.0.1:8000/users
+Accept: application/json
+
+###
+
+# Login with a user
+POST http://127.0.0.1:8000/login?username=admin&password=securepassword
+Content-Type: application/json
+Accept: application/json
+
+###

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CRM Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-title {
+            padding: 20px 0;
+            text-align: center;
+            background-color: #f5f5f5;
+            margin-bottom: 20px;
+        }
+        .card {
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            background-color: #4a4a4a;
+            color: white;
+        }
+        .card-header-title {
+            color: white;
+        }
+        .customer-card .card-header {
+            background-color: #3273dc;
+        }
+        .opportunity-card .card-header {
+            background-color: #23d160;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <section class="hero is-primary">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    <i class="fas fa-tachometer-alt"></i> CRM Dashboard
+                </h1>
+                <h2 class="subtitle">
+                    Overview of your customers and opportunities
+                </h2>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="section">
+        <div class="container">
+            <!-- Summary Cards -->
+            <div class="columns">
+                <div class="column">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            <p class="title">{{ total_customers }}</p>
+                            <p class="subtitle">Total Customers</p>
+                        </div>
+                        <footer class="card-footer">
+                            <a href="/customers" class="card-footer-item">View All</a>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            <p class="title">{{ total_opportunities }}</p>
+                            <p class="subtitle">Total Opportunities</p>
+                        </div>
+                        <footer class="card-footer">
+                            <a href="/opportunities" class="card-footer-item">View All</a>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            <p class="title">${{ total_opportunity_value }}</p>
+                            <p class="subtitle">Total Opportunity Value</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <div class="card-content has-text-centered">
+                            <p class="title">{{ win_rate }}%</p>
+                            <p class="subtitle">Win Rate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Section -->
+            <h3 class="title is-4 mt-6">
+                <i class="fas fa-users"></i> Customers
+            </h3>
+            <div class="columns is-multiline">
+                {% for status, count in customer_status_counts.items() %}
+                <div class="column is-3">
+                    <div class="card customer-card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                {{ status.capitalize() }}
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content has-text-centered">
+                                <p class="title">{{ count }}</p>
+                                <p class="subtitle">Customers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Opportunity Section -->
+            <h3 class="title is-4 mt-6">
+                <i class="fas fa-chart-line"></i> Opportunities
+            </h3>
+            <div class="columns is-multiline">
+                {% for stage, data in opportunity_stage_data.items() %}
+                <div class="column is-3">
+                    <div class="card opportunity-card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                {{ stage.replace('_', ' ').capitalize() }}
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content has-text-centered">
+                                <p class="title">{{ data.count }}</p>
+                                <p class="subtitle">${{ data.value }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Charts Section -->
+            <h3 class="title is-4 mt-6">
+                <i class="fas fa-chart-pie"></i> Analytics
+            </h3>
+            <div class="columns">
+                <div class="column is-6">
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                Opportunities by Stage
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="chart-container">
+                                <canvas id="opportunitiesPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-6">
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                Customers by Status
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="chart-container">
+                                <canvas id="customersPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Items Section -->
+            <h3 class="title is-4 mt-6">
+                <i class="fas fa-clock"></i> Recent Items
+            </h3>
+            <div class="columns">
+                <div class="column is-6">
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                Recent Customers
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for customer in recent_customers %}
+                                        <tr>
+                                            <td>{{ customer.name }}</td>
+                                            <td>
+                                                <span class="tag 
+                                                    {% if customer.status == 'lead' %}is-info
+                                                    {% elif customer.status == 'prospect' %}is-warning
+                                                    {% elif customer.status == 'customer' %}is-success
+                                                    {% else %}is-danger{% endif %}">
+                                                    {{ customer.status }}
+                                                </span>
+                                            </td>
+                                            <td>{{ customer.email }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-6">
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                Recent Opportunities
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content">
+                                <table class="table is-fullwidth">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Stage</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for opportunity in recent_opportunities %}
+                                        <tr>
+                                            <td>{{ opportunity.name }}</td>
+                                            <td>
+                                                <span class="tag 
+                                                    {% if opportunity.stage == 'qualification' %}is-info
+                                                    {% elif opportunity.stage == 'needs_analysis' %}is-light
+                                                    {% elif opportunity.stage == 'proposal' %}is-primary
+                                                    {% elif opportunity.stage == 'negotiation' %}is-warning
+                                                    {% elif opportunity.stage == 'closed_won' %}is-success
+                                                    {% else %}is-danger{% endif %}">
+                                                    {{ opportunity.stage.replace('_', ' ') }}
+                                                </span>
+                                            </td>
+                                            <td>${{ opportunity.amount }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>CRM Dashboard</strong> by <a href="#">Zero-Sugar Consulting , Inc. </a>. The source code is licensed
+                <a href="http://opensource.org/licenses/mit-license.php">MIT</a>.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Data for pie charts
+        const opportunityStageLabels = JSON.parse('{{ opportunity_stage_labels|tojson|safe }}');
+        const opportunityStageCounts = JSON.parse('{{ opportunity_stage_counts|tojson|safe }}');
+        const opportunityStageColors = [
+            '#3273dc', '#00d1b2', '#ffdd57', '#ff3860', '#209cee', '#7957d5'
+        ];
+
+        const customerStatusLabels = JSON.parse('{{ customer_status_labels|tojson|safe }}');
+        const customerStatusCounts = JSON.parse('{{ customer_status_counts_list|tojson|safe }}');
+        const customerStatusColors = [
+            '#3273dc', '#00d1b2', '#ffdd57', '#ff3860'
+        ];
+
+        // Create opportunity pie chart
+        const opportunitiesCtx = document.getElementById('opportunitiesPieChart').getContext('2d');
+        new Chart(opportunitiesCtx, {
+            type: 'pie',
+            data: {
+                labels: opportunityStageLabels,
+                datasets: [{
+                    data: opportunityStageCounts,
+                    backgroundColor: opportunityStageColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+
+        // Create customer pie chart
+        const customersCtx = document.getElementById('customersPieChart').getContext('2d');
+        new Chart(customersCtx, {
+            type: 'pie',
+            data: {
+                labels: customerStatusLabels,
+                datasets: [{
+                    data: customerStatusCounts,
+                    backgroundColor: customerStatusColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
